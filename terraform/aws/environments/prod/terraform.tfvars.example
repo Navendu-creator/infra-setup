@@ -1,0 +1,28 @@
+# AWS Prod Environment Configuration
+# Copy this file to terraform.tfvars and adjust values as needed.
+
+aws_region   = "us-east-1"
+environment  = "prod"
+
+# Networking - CHANGE THESE to match your naming convention
+vpc_name = "prod-vpc"
+vpc_cidr = "10.2.0.0/16"
+
+# Kubernetes - CHANGE THESE to match your naming convention
+cluster_name        = "prod-cluster"
+kubernetes_version  = "1.29"
+node_instance_type  = "t3.large"
+node_count          = 1
+
+# PostgreSQL - CHANGE THESE to match your naming convention
+postgres_name           = "prod-postgres"
+postgres_instance_class  = "db.t3.medium"
+postgres_engine_version  = "15"
+database_name            = "appdb"
+database_username        = "dbadmin"
+
+# DNS - CHANGE THIS to your registered domain
+domain_name = "prod.example.com"
+
+# Project
+project_name = "cloud-support-engineering"

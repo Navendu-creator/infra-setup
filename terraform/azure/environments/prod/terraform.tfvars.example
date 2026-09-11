@@ -1,0 +1,38 @@
+# Azure Prod Environment Configuration
+# Copy this file to terraform.tfvars and adjust values as needed.
+
+location             = "East US"
+environment          = "prod"
+
+# Resource Group - CHANGE THIS to match your naming convention
+resource_group_name = "prod-rg"
+
+# Networking - CHANGE THESE to match your naming convention
+vnet_name           = "prod-vnet"
+vnet_address_space   = ["10.2.0.0/16"]
+aks_subnet_cidr     = "10.2.1.0/24"
+postgres_subnet_cidr = "10.2.2.0/24"
+
+# Kubernetes - CHANGE THESE to match your naming convention
+cluster_name        = "prod-cluster"
+kubernetes_version  = "1.29"
+node_count          = 1
+node_vm_size        = "Standard_D2s_v3"
+
+# PostgreSQL - CHANGE THESE to match your naming convention
+postgres_name        = "prod-pgserver"
+postgres_version     = "15"
+postgres_sku_name     = "GP_Standard_D4s_v3"
+postgres_storage_mb   = 131072
+database_name         = "appdb"
+admin_username         = "dbadmin"
+
+# DNS - CHANGE THESE to your registered domain
+dns_zone_name  = "example.com"
+dns_record_name = "prod"
+
+# Key Vault - CHANGE THIS to a globally unique name
+key_vault_name = "prod-keyvault-12345"
+
+# Project
+project_name = "cloud-support-engineering"

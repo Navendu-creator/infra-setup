@@ -1,0 +1,38 @@
+# Azure Staging Environment Configuration
+# Copy this file to terraform.tfvars and adjust values as needed.
+
+location             = "East US"
+environment          = "staging"
+
+# Resource Group - CHANGE THIS to match your naming convention
+resource_group_name = "staging-rg"
+
+# Networking - CHANGE THESE to match your naming convention
+vnet_name           = "staging-vnet"
+vnet_address_space   = ["10.1.0.0/16"]
+aks_subnet_cidr     = "10.1.1.0/24"
+postgres_subnet_cidr = "10.1.2.0/24"
+
+# Kubernetes - CHANGE THESE to match your naming convention
+cluster_name        = "staging-cluster"
+kubernetes_version  = "1.29"
+node_count          = 1
+node_vm_size        = "Standard_B2s"
+
+# PostgreSQL - CHANGE THESE to match your naming convention
+postgres_name        = "staging-pgserver"
+postgres_version     = "15"
+postgres_sku_name     = "GP_Standard_D2s_v3"
+postgres_storage_mb   = 65536
+database_name         = "appdb"
+admin_username         = "dbadmin"
+
+# DNS - CHANGE THESE to your registered domain
+dns_zone_name  = "example.com"
+dns_record_name = "staging"
+
+# Key Vault - CHANGE THIS to a globally unique name
+key_vault_name = "staging-keyvault-12345"
+
+# Project
+project_name = "cloud-support-engineering"
