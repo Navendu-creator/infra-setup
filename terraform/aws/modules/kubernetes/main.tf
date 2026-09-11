@@ -110,9 +110,6 @@ resource "aws_eks_node_group" "this" {
 
   instance_types = [var.node_instance_type]
   disk_size      = var.node_disk_size
-  desired_size   = var.node_count
-  min_size      = var.node_count
-  max_size      = var.node_count
 
   scaling_config {
     desired_size = var.node_count

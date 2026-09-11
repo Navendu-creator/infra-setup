@@ -26,7 +26,7 @@ terraform {
 
   # CHANGE THIS: Configure your S3 backend for state storage
   # backend "s3" {
-  #   bucket         = "your-terraform-state-bucket"
+  #   bucket         = "aws-k8s-platform-tfstate-686458136675"
   #   key            = "aws/dev/terraform.tfstate"
   #   region         = "us-east-1"
   #   encrypt        = true
