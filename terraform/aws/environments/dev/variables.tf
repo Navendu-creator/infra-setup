@@ -79,7 +79,7 @@ variable "database_username" {
 variable "domain_name" {
   description = "Domain name for the application. CHANGE THIS to your registered domain."
   type        = string
-  default     = "petclininc.com"
+  default     = "app.petclininc.com"
 }
 
 variable "project_name" {

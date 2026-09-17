@@ -59,14 +59,7 @@ module "traefik" {
   tags         = local.common_tags
 }
 
-# DNS Module
-module "dns" {
-  source = "../../modules/dns"
-
-  domain_name            = var.domain_name
-  load_balancer_hostname = module.traefik.load_balancer_hostname
-  tags                   = local.common_tags
-}
+#
 
 # Kubernetes Application Manifests
 # Deploys the sample application into the cluster
@@ -79,7 +72,7 @@ module "app" {
   postgres_username    = module.postgres.database_username
   postgres_password    = module.postgres.database_password
   secret_arn           = module.postgres.secret_arn
-  application_hostname = module.dns.application_hostname
+  application_hostname = module.traefik.load_balancer_hostname
   cloud                = "AWS"
   tags                 = local.common_tags
 }

@@ -39,12 +39,15 @@ output "traefik_public_hostname" {
   value       = module.traefik.load_balancer_hostname
 }
 
-output "application_hostname" {
-  description = "Hostname that resolves to the application through Traefik"
-  value       = module.dns.application_hostname
-}
-
 output "application_url" {
   description = "Full URL to access the application"
-  value       = "https://${module.dns.application_hostname}"
+  value       = "http://${module.traefik.load_balancer_hostname}"
+}
+
+output "cluster_endpoint" {
+  value = module.kubernetes.cluster_endpoint
+}
+
+output "cluster_name" {
+  value = module.kubernetes.cluster_name
 }

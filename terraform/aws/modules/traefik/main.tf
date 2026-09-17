@@ -1,3 +1,4 @@
+
 # Create namespace for Traefik
 resource "kubernetes_namespace" "traefik" {
   metadata {
@@ -63,7 +64,7 @@ resource "helm_release" "traefik" {
 
   # Redirect HTTP -> HTTPS
   set {
-    name  = "ports.web.redirectTo"
+    name  = "ports.web.redirectTo.port"
     value = "websecure"
   }
 
