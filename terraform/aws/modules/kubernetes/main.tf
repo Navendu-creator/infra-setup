@@ -83,6 +83,10 @@ resource "aws_eks_cluster" "this" {
   version  = var.kubernetes_version
   role_arn = aws_iam_role.cluster.arn
 
+  access_config {
+    authentication_mode                         = "API_AND_CONFIG_MAP"
+    bootstrap_cluster_creator_admin_permissions = false
+  }
   vpc_config {
     subnet_ids              = var.private_subnet_ids
     endpoint_private_access = true
@@ -110,9 +114,6 @@ resource "aws_eks_node_group" "this" {
 
   instance_types = [var.node_instance_type]
   disk_size      = var.node_disk_size
-  desired_size   = var.node_count
-  min_size      = var.node_count
-  max_size      = var.node_count
 
   scaling_config {
     desired_size = var.node_count
@@ -136,16 +137,29 @@ resource "aws_eks_access_entry" "this" {
   cluster_name  = aws_eks_cluster.this.name
   principal_arn = data.aws_caller_identity.current.arn
   type          = "STANDARD"
+  tags = merge(var.tags, {
+    ManagedBy = "terraform"
+  })
 }
 
 resource "aws_eks_access_policy_association" "this" {
   cluster_name  = aws_eks_cluster.this.name
   principal_arn = data.aws_caller_identity.current.arn
-  policy_arn    = "arn:aws:eks:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:access-policy/AmazonEKSAdminPolicy"
+  policy_arn    =  "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
 
   access_scope {
     type = "cluster"
   }
+  depends_on = [
+    aws_eks_access_entry.this,
+  ]
+}
+
+
+resource "time_sleep" "wait_for_access_propagation" {
+  create_duration = "30s"
+  depends_on      = [aws_eks_access_policy_association.this]
 }
 
 data "aws_caller_identity" "current" {}

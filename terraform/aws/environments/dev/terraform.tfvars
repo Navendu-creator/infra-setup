@@ -1,28 +1,28 @@
 # AWS Dev Environment Configuration
 # Copy this file to terraform.tfvars and adjust values as needed.
 
-aws_region   = "us-east-1"
-environment  = "dev"
+aws_region  = "us-east-1"
+environment = "dev"
 
 # Networking - CHANGE THESE to match your naming convention
 vpc_name = "dev-vpc"
 vpc_cidr = "10.0.0.0/16"
 
 # Kubernetes - CHANGE THESE to match your naming convention
-cluster_name        = "dev-cluster"
-kubernetes_version  = "1.29"
-node_instance_type  = "t3.medium"
-node_count          = 1
+cluster_name       = "dev-cluster"
+kubernetes_version = "1.34"
+node_instance_type = "t3.small"
+node_count         = 1
 
 # PostgreSQL - CHANGE THESE to match your naming convention
 postgres_name           = "dev-postgres"
-postgres_instance_class  = "db.t3.micro"
-postgres_engine_version  = "15"
-database_name            = "appdb"
-database_username        = "dbadmin"
+postgres_instance_class = "db.t3.micro"
+postgres_engine_version = "15"
+database_name           = "appdb"
+database_username       = "dbadmin"
 
 # DNS - CHANGE THIS to your registered domain
-domain_name = "dev.example.com"
+domain_name = "app.petclininc.com"
 
 # Project
-project_name = "cloud-support-engineering"
+project_name = "dev-infra"

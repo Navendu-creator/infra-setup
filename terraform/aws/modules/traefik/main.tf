@@ -1,7 +1,9 @@
+
 # Create namespace for Traefik
 resource "kubernetes_namespace" "traefik" {
   metadata {
     name = var.namespace
+
     labels = {
       "app.kubernetes.io/managed-by" = "terraform"
     }
@@ -26,19 +28,19 @@ resource "helm_release" "traefik" {
     value = "1"
   }
 
-  # Expose Traefik via a LoadBalancer service
-  # AWS will provision a Classic Load Balancer or NLB
+  # Expose Traefik through AWS LoadBalancer
   set {
     name  = "service.type"
     value = "LoadBalancer"
   }
 
-  # Enable HTTP (port 80) and HTTPS (port 443)
+  # Traefik internal port
   set {
     name  = "ports.traefik.port"
     value = "9000"
   }
 
+  # HTTP
   set {
     name  = "ports.web.port"
     value = "8000"
@@ -49,6 +51,7 @@ resource "helm_release" "traefik" {
     value = "80"
   }
 
+  # HTTPS
   set {
     name  = "ports.websecure.port"
     value = "8443"
@@ -59,13 +62,13 @@ resource "helm_release" "traefik" {
     value = "443"
   }
 
-  # Enable SSL redirection
+  # Redirect HTTP -> HTTPS
   set {
-    name  = "ports.web.redirectTo"
+    name  = "ports.web.redirectTo.port"
     value = "websecure"
   }
 
-  # AWS-specific annotations for the LoadBalancer
+  # AWS LoadBalancer configuration
   set {
     name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
     value = "nlb"
@@ -76,7 +79,7 @@ resource "helm_release" "traefik" {
     value = "internet-facing"
   }
 
-  # Resource limits for development
+  # Resource requests
   set {
     name  = "resources.requests.cpu"
     value = "100m"
@@ -87,6 +90,7 @@ resource "helm_release" "traefik" {
     value = "128Mi"
   }
 
+  # Resource limits
   set {
     name  = "resources.limits.cpu"
     value = "500m"
@@ -97,17 +101,30 @@ resource "helm_release" "traefik" {
     value = "256Mi"
   }
 
-  depends_on = [kubernetes_namespace.traefik]
+  depends_on = [
+    kubernetes_namespace.traefik
+  ]
 }
 
-# Wait for the LoadBalancer to get an external hostname
-resource "kubernetes_service" "traefik_data" {
+# Read the Traefik Service after LoadBalancer provisioning
+data "kubernetes_service" "traefik" {
   metadata {
     name      = "traefik"
-    namespace = kubernetes_namespace.traefik.metadata[0].name
+    namespace = var.namespace
   }
 
-  wait_for_load_balancer = true
-
-  depends_on = [helm_release.traefik]
+  depends_on = [
+    time_sleep.wait_for_lb
+  ]
 }
+
+
+# Wait for AWS LoadBalancer to be provisioned
+resource "time_sleep" "wait_for_lb" {
+  create_duration = "60s"
+
+  depends_on = [
+    helm_release.traefik
+  ]
+}
+

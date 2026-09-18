@@ -61,7 +61,7 @@ resource "helm_release" "traefik" {
 
   # Enable SSL redirection
   set {
-    name  = "ports.web.redirectTo"
+    name  = "ports.web.redirectTo.port""
     value = "websecure"
   }
 

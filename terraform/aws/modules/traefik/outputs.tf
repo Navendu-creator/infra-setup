@@ -5,7 +5,11 @@ output "namespace" {
 
 output "load_balancer_hostname" {
   description = "External hostname of the Traefik LoadBalancer"
-  value       = kubernetes_service.traefik_data.status[0].load_balancer[0].ingress[0].hostname
+
+  value = try(
+    data.kubernetes_service.traefik.status[0].load_balancer[0].ingress[0].hostname,
+    null
+  )
 }
 
 output "helm_release_name" {

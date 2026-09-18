@@ -1,3 +1,4 @@
+
 # Namespace for the sample application
 resource "kubernetes_namespace" "app" {
   metadata {
