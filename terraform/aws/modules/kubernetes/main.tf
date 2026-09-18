@@ -85,7 +85,7 @@ resource "aws_eks_cluster" "this" {
 
   access_config {
     authentication_mode                         = "API_AND_CONFIG_MAP"
-    bootstrap_cluster_creator_admin_permissions = true
+    bootstrap_cluster_creator_admin_permissions = false
   }
   vpc_config {
     subnet_ids              = var.private_subnet_ids
@@ -137,12 +137,15 @@ resource "aws_eks_access_entry" "this" {
   cluster_name  = aws_eks_cluster.this.name
   principal_arn = data.aws_caller_identity.current.arn
   type          = "STANDARD"
+  tags = merge(var.tags, {
+    ManagedBy = "terraform"
+  })
 }
 
 resource "aws_eks_access_policy_association" "this" {
   cluster_name  = aws_eks_cluster.this.name
   principal_arn = data.aws_caller_identity.current.arn
-  policy_arn    =  "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+  policy_arn    =  "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 
 
   access_scope {
@@ -151,6 +154,12 @@ resource "aws_eks_access_policy_association" "this" {
   depends_on = [
     aws_eks_access_entry.this,
   ]
+}
+
+
+resource "time_sleep" "wait_for_access_propagation" {
+  create_duration = "30s"
+  depends_on      = [aws_eks_access_policy_association.this]
 }
 
 data "aws_caller_identity" "current" {}

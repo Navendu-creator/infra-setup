@@ -106,7 +106,7 @@ resource "helm_release" "traefik" {
   ]
 }
 
-# Read the Service created by the Traefik Helm release
+# Read the Traefik Service after LoadBalancer provisioning
 data "kubernetes_service" "traefik" {
   metadata {
     name      = "traefik"
@@ -114,6 +114,17 @@ data "kubernetes_service" "traefik" {
   }
 
   depends_on = [
+    time_sleep.wait_for_lb
+  ]
+}
+
+
+# Wait for AWS LoadBalancer to be provisioned
+resource "time_sleep" "wait_for_lb" {
+  create_duration = "60s"
+
+  depends_on = [
     helm_release.traefik
   ]
 }
+

@@ -28,3 +28,7 @@ output "node_role_arn" {
   description = "ARN of the EKS node IAM role"
   value       = aws_iam_role.node.arn
 }
+output "access_ready" {
+  value      = true
+  depends_on = [time_sleep.wait_for_access_propagation]
+}

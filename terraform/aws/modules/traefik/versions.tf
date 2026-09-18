@@ -10,5 +10,8 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.23"
     }
+    time = {
+     source = "hashicorp/time"
+    }
   }
 }

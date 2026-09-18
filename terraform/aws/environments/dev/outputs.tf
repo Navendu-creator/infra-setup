@@ -41,7 +41,7 @@ output "traefik_public_hostname" {
 
 output "application_url" {
   description = "Full URL to access the application"
-  value       = "http://${module.traefik.load_balancer_hostname}"
+  value       = module.traefik.load_balancer_hostname != null ? "http://${module.traefik.load_balancer_hostname}" : "pending - LB hostname not yet available, re-run terraform apply"
 }
 
 output "cluster_endpoint" {
@@ -51,3 +51,4 @@ output "cluster_endpoint" {
 output "cluster_name" {
   value = module.kubernetes.cluster_name
 }
+

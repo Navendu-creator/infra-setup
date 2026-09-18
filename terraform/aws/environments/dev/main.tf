@@ -57,6 +57,7 @@ module "traefik" {
 
   cluster_name = var.cluster_name
   tags         = local.common_tags
+  depends_on = [module.kubernetes.access_ready]
 }
 
 #
@@ -75,4 +76,6 @@ module "app" {
   application_hostname = module.traefik.load_balancer_hostname
   cloud                = "AWS"
   tags                 = local.common_tags
+  depends_on = [module.kubernetes.access_ready]
+
 }
