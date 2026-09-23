@@ -1,25 +1,13 @@
 variable "namespace" {
-  description = "Kubernetes namespace for the sample application"
+  description = "Kubernetes namespace for the Petclinic application"
   type        = string
-  default     = "sample-app"
+  default     = "petclinic"
 }
 
 variable "app_name" {
-  description = "Name of the sample application"
+  description = "Application name"
   type        = string
-  default     = "hello-app"
-}
-
-variable "app_image" {
-  description = "Container image for the sample application"
-  type        = string
-  default     = "nginx:1.25-alpine"
-}
-
-variable "app_port" {
-  description = "Port the application listens on"
-  type        = number
-  default     = 8080
+  default     = "petclinic"
 }
 
 variable "postgres_host" {
@@ -43,23 +31,13 @@ variable "postgres_username" {
 }
 
 variable "postgres_password" {
-  description = "Password for the PostgreSQL database (sensitive)"
+  description = "Password for the PostgreSQL database"
   type        = string
   sensitive   = true
 }
 
 variable "secret_arn" {
-  description = "ARN of the AWS Secrets Manager secret (for reference)"
-  type        = string
-}
-
-variable "application_hostname" {
-  description = "Hostname for the application (used in ingress)"
-  type        = string
-}
-
-variable "cloud" {
-  description = "Cloud provider name (for the response message)"
+  description = "ARN of the AWS Secrets Manager secret"
   type        = string
 }
 
