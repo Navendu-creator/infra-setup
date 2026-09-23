@@ -57,7 +57,7 @@ module "traefik" {
 
   cluster_name = var.cluster_name
   tags         = local.common_tags
-  depends_on = [module.kubernetes.access_ready]
+  depends_on   = [module.kubernetes.access_ready]
 }
 
 #
@@ -67,15 +67,18 @@ module "traefik" {
 module "app" {
   source = "../../modules/app"
 
-  postgres_host        = module.postgres.endpoint
-  postgres_port        = 5432
-  postgres_database    = module.postgres.database_name
-  postgres_username    = module.postgres.database_username
-  postgres_password    = module.postgres.database_password
-  secret_arn           = module.postgres.secret_arn
-  application_hostname = module.traefik.load_balancer_hostname
-  cloud                = "AWS"
-  tags                 = local.common_tags
-  depends_on = [module.kubernetes.access_ready]
+  namespace = "petclinic"
+  app_name  = "petclinic"
 
+  postgres_host     = module.postgres.endpoint
+  postgres_port     = 5432
+  postgres_database = module.postgres.database_name
+  postgres_username = module.postgres.database_username
+  postgres_password = module.postgres.database_password
+
+  secret_arn = module.postgres.secret_arn
+
+  tags = local.common_tags
+
+  depends_on = [module.kubernetes.access_ready]
 }

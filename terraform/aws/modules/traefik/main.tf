@@ -62,11 +62,7 @@ resource "helm_release" "traefik" {
     value = "443"
   }
 
-  # Redirect HTTP -> HTTPS
-  set {
-    name  = "ports.web.redirectTo.port"
-    value = "websecure"
-  }
+
 
   # AWS LoadBalancer configuration
   set {
