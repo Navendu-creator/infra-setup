@@ -12,7 +12,7 @@ vpc_cidr = "10.0.0.0/16"
 cluster_name       = "dev-cluster"
 kubernetes_version = "1.34"
 node_instance_type = "t3.small"
-node_count         = 1
+node_count         = 2
 
 # PostgreSQL - CHANGE THESE to match your naming convention
 postgres_name           = "dev-postgres"

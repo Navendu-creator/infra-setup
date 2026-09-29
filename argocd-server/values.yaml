@@ -1,5 +1,5 @@
 global:
-  domain: argocd.kyabhai.in
+  domain: "${traefik_nlb_dns}"
 
 configs:
   params:
@@ -12,7 +12,18 @@ server:
     type: ClusterIP
 
   ingress:
-    enabled: false
+    enabled: true
+    controller: generic
+    ingressClassName: traefik
+
+    hostname: "${traefik_nlb_dns}"
+
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+
+    path: /
+    pathType: Prefix
+    tls: false
 
 controller:
   replicas: 1
