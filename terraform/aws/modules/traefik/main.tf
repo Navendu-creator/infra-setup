@@ -1,4 +1,3 @@
-
 # Create namespace for Traefik
 resource "kubernetes_namespace" "traefik" {
   metadata {
@@ -18,6 +17,7 @@ resource "helm_release" "traefik" {
   version    = "27.0.2"
   namespace  = kubernetes_namespace.traefik.metadata[0].name
 
+  # Deployment
   set {
     name  = "deployment.kind"
     value = "Deployment"
@@ -28,30 +28,49 @@ resource "helm_release" "traefik" {
     value = "1"
   }
 
-  # Expose Traefik through AWS LoadBalancer
+  # Service
   set {
     name  = "service.type"
     value = "LoadBalancer"
   }
 
-  # Traefik internal port
+  # AWS NLB
+  set {
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-scheme"
+    value = "internet-facing"
+  }
+
+  set {
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
+    value = "nlb"
+  }
+
+  # Traefik dashboard/internal
   set {
     name  = "ports.traefik.port"
     value = "9000"
   }
 
-  # HTTP
-  set {
-    name  = "ports.web.port"
-    value = "8000"
-  }
+  # ArgoCD - HTTP port 80
 
-  set {
-    name  = "ports.web.exposedPort"
-    value = "80"
-  }
+ 
+  # Petclinic - HTTP port 8080
+set {
+  name  = "ports.petclinic.port"
+  value = "8080"
+}
 
-  # HTTPS
+set {
+  name  = "ports.petclinic.exposedPort"
+  value = "8080"
+}
+
+set {
+  name  = "ports.petclinic.expose.default"
+  value = "true"
+}
+  
+  # HTTPS port 443
   set {
     name  = "ports.websecure.port"
     value = "8443"
@@ -62,20 +81,29 @@ resource "helm_release" "traefik" {
     value = "443"
   }
 
-
-
-  # AWS LoadBalancer configuration
+  # Petclinic - HTTP port 8080
   set {
-    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
-    value = "nlb"
+    name  = "ports.petclinic.port"
+    value = "8080"
   }
 
   set {
-    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-scheme"
-    value = "internet-facing"
+    name  = "ports.petclinic.exposedPort"
+    value = "8080"
   }
 
-  # Resource requests
+  set {
+    name  = "ports.petclinic.expose.default"
+    value = "true"
+  }
+
+  # HTTP -> HTTPS redirect
+  set {
+    name  = "ports.web.redirectTo.port"
+    value = "websecure"
+  }
+
+  # Resource limits
   set {
     name  = "resources.requests.cpu"
     value = "100m"
@@ -86,7 +114,6 @@ resource "helm_release" "traefik" {
     value = "128Mi"
   }
 
-  # Resource limits
   set {
     name  = "resources.limits.cpu"
     value = "500m"
@@ -101,21 +128,6 @@ resource "helm_release" "traefik" {
     kubernetes_namespace.traefik
   ]
 }
-
-# Read the Traefik Service after LoadBalancer provisioning
-data "kubernetes_service" "traefik" {
-  metadata {
-    name      = "traefik"
-    namespace = var.namespace
-  }
-
-  depends_on = [
-    time_sleep.wait_for_lb
-  ]
-}
-
-
-# Wait for AWS LoadBalancer to be provisioned
 resource "time_sleep" "wait_for_lb" {
   create_duration = "60s"
 
@@ -123,4 +135,14 @@ resource "time_sleep" "wait_for_lb" {
     helm_release.traefik
   ]
 }
+# Wait for the LoadBalancer
+data "kubernetes_service" "traefik" {
+  metadata {
+    name      = "traefik"
+    namespace = kubernetes_namespace.traefik.metadata[0].name
+  }
 
+  depends_on = [
+    helm_release.traefik
+  ]
+}

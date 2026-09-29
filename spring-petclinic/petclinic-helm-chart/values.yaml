@@ -20,7 +20,7 @@ ingress:
   enabled: true
   host: ""
   className: traefik
-  entrypoint: web
+  entrypoint: petclinic
   tls: false
 
 # # Default values for petclinic-helm-chart.

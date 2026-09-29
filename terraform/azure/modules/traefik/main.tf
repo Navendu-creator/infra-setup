@@ -2,6 +2,7 @@
 resource "kubernetes_namespace" "traefik" {
   metadata {
     name = var.namespace
+
     labels = {
       "app.kubernetes.io/managed-by" = "terraform"
     }
@@ -16,6 +17,10 @@ resource "helm_release" "traefik" {
   version    = "27.0.2"
   namespace  = kubernetes_namespace.traefik.metadata[0].name
 
+  # ---------------------------------------------------------
+  # Deployment
+  # ---------------------------------------------------------
+
   set {
     name  = "deployment.kind"
     value = "Deployment"
@@ -26,18 +31,39 @@ resource "helm_release" "traefik" {
     value = "1"
   }
 
-  # Expose Traefik via a LoadBalancer service
-  # Azure will provision a Standard Load Balancer with a public IP
+  # ---------------------------------------------------------
+  # Service
+  # ---------------------------------------------------------
+
   set {
     name  = "service.type"
     value = "LoadBalancer"
   }
 
-  # Enable HTTP (port 80) and HTTPS (port 443)
+  # AWS NLB
+  set {
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-scheme"
+    value = "internet-facing"
+  }
+
+  set {
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
+    value = "nlb"
+  }
+
+  # ---------------------------------------------------------
+  # Traefik Dashboard / Internal
+  # ---------------------------------------------------------
+
   set {
     name  = "ports.traefik.port"
     value = "9000"
   }
+
+  # ---------------------------------------------------------
+  # ArgoCD
+  # External: http://<NLB-DNS>/
+  # ---------------------------------------------------------
 
   set {
     name  = "ports.web.port"
@@ -49,6 +75,11 @@ resource "helm_release" "traefik" {
     value = "80"
   }
 
+  # ---------------------------------------------------------
+  # HTTPS
+  # External: https://<NLB-DNS>/
+  # ---------------------------------------------------------
+
   set {
     name  = "ports.websecure.port"
     value = "8443"
@@ -59,20 +90,39 @@ resource "helm_release" "traefik" {
     value = "443"
   }
 
-  # Enable SSL redirection
+  # ---------------------------------------------------------
+  # Petclinic
+  # External: http://<NLB-DNS>:8080/
+  # ---------------------------------------------------------
+
   set {
-    name  = "ports.web.redirectTo.port""
+    name  = "ports.petclinic.port"
+    value = "8080"
+  }
+
+  set {
+    name  = "ports.petclinic.exposedPort"
+    value = "8080"
+  }
+
+  set {
+  name  = "ports.petclinic.expose"
+  value = "true"
+  }
+
+  # ---------------------------------------------------------
+  # HTTP -> HTTPS redirect
+  # ---------------------------------------------------------
+
+  set {
+    name  = "ports.web.redirectTo.port"
     value = "websecure"
   }
 
-  # Azure-specific annotations for the LoadBalancer
-  # Use Standard SKU Load Balancer (AKS default)
-  set {
-    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-internal"
-    value = "false"
-  }
+  # ---------------------------------------------------------
+  # Resources
+  # ---------------------------------------------------------
 
-  # Resource limits for development
   set {
     name  = "resources.requests.cpu"
     value = "100m"
@@ -93,17 +143,29 @@ resource "helm_release" "traefik" {
     value = "256Mi"
   }
 
-  depends_on = [kubernetes_namespace.traefik]
+  depends_on = [
+    kubernetes_namespace.traefik
+  ]
 }
 
-# Wait for the LoadBalancer to get an external IP
-resource "kubernetes_service" "traefik_data" {
+resource "time_sleep" "wait_for_lb" {
+  create_duration = "60s"
+
+  depends_on = [
+    helm_release.traefik
+  ]
+}
+
+# Read the Traefik LoadBalancer service created by Helm
+data "kubernetes_service" "traefik" {
   metadata {
     name      = "traefik"
     namespace = kubernetes_namespace.traefik.metadata[0].name
   }
 
-  wait_for_load_balancer = true
-
-  depends_on = [helm_release.traefik]
+  depends_on = [
+    helm_release.traefik
+  ]
 }
+
+
