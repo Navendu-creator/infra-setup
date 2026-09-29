@@ -1,0 +1,52 @@
+name: Deploy and Test Cluster
+
+on:
+  push:
+    branches: [test]
+  pull_request:
+    branches: [test]
+
+jobs:
+  deploy-and-test-cluster:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Kind Cluster
+        uses: helm/kind-action@v1
+
+      # ✅ Step 1: Namespace
+      - name: Create Namespace
+      
+      - name: Deploy application
+        run: |
+          kubectl apply -f k8s/namespace.yml
+
+      # ✅ Step 2: DB
+      - name: Deploy DB
+        run: |
+          kubectl apply -f k8s/db.yml
+
+      # ✅ Step 3: App
+      - name: Deploy Petclinic
+        run: |
+          kubectl apply -f k8s/petclinic.yml
+
+      # ✅ Step 4: Wait
+      - name: Wait for Pods
+        run: |
+          kubectl wait --for=condition=ready pod -l app=demo-db -n projects --timeout=180s
+          kubectl wait --for=condition=ready pod -l app=petclinic -n projects --timeout=180s
+
+      # ✅ Debug (optional but useful)
+      - name: Debug Pods
+        run: |
+          kubectl get all -n projects
+
+      - name: Health Check
+        run: |
+          kubectl port-forward service/petclinic 8080:80 -n projects &
+          sleep 10
+          curl -f http://localhost:8080 || exit 1
