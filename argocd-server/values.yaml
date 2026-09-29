@@ -1,0 +1,27 @@
+global:
+  domain: argocd.kyabhai.in
+
+configs:
+  params:
+    server.insecure: true
+
+server:
+  replicas: 1
+
+  service:
+    type: ClusterIP
+
+  ingress:
+    enabled: false
+
+controller:
+  replicas: 1
+
+repoServer:
+  replicas: 1
+
+applicationSet:
+  replicas: 1
+
+redis:
+  enabled: true
