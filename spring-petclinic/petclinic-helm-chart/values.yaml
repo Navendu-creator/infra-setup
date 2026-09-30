@@ -12,7 +12,7 @@ service:
   port: 8080
 
 postgres:
-  host: dev-postgres.cu9m0gmg871y.us-east-1.rds.amazonaws.com
+  host: test-postgres.cu9m0gmg871y.us-east-1.rds.amazonaws.com
   port: 5432
   database: appdb
 
