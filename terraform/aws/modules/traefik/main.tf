@@ -98,10 +98,7 @@ set {
   }
 
   # HTTP -> HTTPS redirect
-  set {
-    name  = "ports.web.redirectTo.port"
-    value = "websecure"
-  }
+  
 
   # Resource limits
   set {
