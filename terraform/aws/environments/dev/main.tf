@@ -67,7 +67,7 @@ module "traefik" {
 module "app" {
   source = "../../modules/app"
 
-  namespace = "petcliniccc"
+  namespace = "petclinic"
   app_name  = "petclinic"
 
   postgres_host     = module.postgres.endpoint
