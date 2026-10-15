@@ -25,7 +25,7 @@ resource "helm_release" "traefik" {
 
   set {
     name  = "deployment.replicas"
-    value = "1"
+    value = "2"
   }
 
   # Service
