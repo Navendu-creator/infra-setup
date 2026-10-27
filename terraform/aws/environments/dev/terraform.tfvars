@@ -1,5 +1,5 @@
 # AWS Dev Environment Configuration
-# Copy this file to terraform.tfvars and adjust values as needed.
+# EKS infrastructure for Wazuh (Wazuh itself is deployed separately).
 
 aws_region  = "us-east-1"
 environment = "dev"
@@ -11,18 +11,17 @@ vpc_cidr = "10.0.0.0/16"
 # Kubernetes - CHANGE THESE to match your naming convention
 cluster_name       = "dev-cluster"
 kubernetes_version = "1.34"
-node_instance_type = "t3.small"
+node_instance_type = "t3.large"
+node_capacity_type = "SPOT"
 node_count         = 2
+node_disk_size     = 30
 
-# PostgreSQL - CHANGE THESE to match your naming convention
-postgres_name           = "dev-postgres"
-postgres_instance_class = "db.t3.micro"
-postgres_engine_version = "15"
-database_name           = "appdb"
-database_username       = "dbadmin"
-
-# DNS - CHANGE THIS to your registered domain
-domain_name = "app.petclininc.com"
+# Who gets kubectl admin on the cluster. List both your own IAM user and the
+# IAM user whose keys are in GitHub secrets, otherwise each apply locks the other out.
+cluster_admin_arns = [
+  # "arn:aws:iam::<ACCOUNT_ID>:user/<your-user>",
+  # "arn:aws:iam::<ACCOUNT_ID>:user/<github-actions-user>",
+]
 
 # Project
 project_name = "dev-infra"

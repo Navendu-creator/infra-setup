@@ -132,7 +132,7 @@ self_heal_state() {
 
   local principal_arn
   principal_arn=$(aws sts get-caller-identity --query Arn --output text 2>/dev/null || echo "")
-  local access_entry_address="module.kubernetes.aws_eks_access_entry.this"
+  local access_entry_address="module.kubernetes.aws_eks_access_entry.this[0]"
 
   if [[ -n "$principal_arn" ]] && aws eks describe-cluster --name "$CLUSTER_NAME" --region "$AWS_REGION" >/dev/null 2>&1; then
     if aws eks list-access-entries --cluster-name "$CLUSTER_NAME" --region "$AWS_REGION" --query "accessEntries" --output text 2>/dev/null | grep -q "$principal_arn"; then
