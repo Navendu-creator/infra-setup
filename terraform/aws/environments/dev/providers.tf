@@ -6,7 +6,9 @@ provider "aws" {
   }
 }
 
-# Kubernetes provider configuration
+# Kubernetes / Helm / kubectl providers: no resources use them any more, but they are
+# needed to destroy the old Traefik/Petclinic resources still in state. Remove them
+# once that state has been cleaned up.
 provider "kubernetes" {
   host                   = module.kubernetes.cluster_endpoint
   cluster_ca_certificate = base64decode(module.kubernetes.cluster_ca_certificate)

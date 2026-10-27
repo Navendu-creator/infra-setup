@@ -34,6 +34,18 @@ variable "database_subnet_cidrs" {
   default     = ["10.0.20.0/24", "10.0.21.0/24"]
 }
 
+variable "enable_nat_gateway" {
+  description = "Create a NAT gateway for private/database subnet egress. Disable to save cost when nodes run in public subnets."
+  type        = bool
+  default     = true
+}
+
+variable "map_public_ip_on_launch" {
+  description = "Assign public IPs to instances in public subnets. Required when EKS nodes run in public subnets."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Common tags applied to all resources"
   type        = map(string)

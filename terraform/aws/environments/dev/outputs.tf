@@ -13,35 +13,14 @@ output "resource_prefix" {
   value       = var.vpc_name
 }
 
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = module.networking.vpc_id
+}
+
 output "kubernetes_cluster_name" {
   description = "Name of the EKS cluster"
   value       = module.kubernetes.cluster_name
-}
-
-output "postgres_endpoint" {
-  description = "Endpoint of the RDS PostgreSQL instance"
-  value       = module.postgres.endpoint
-}
-
-output "postgres_database_name" {
-  description = "Name of the database"
-  value       = module.postgres.database_name
-}
-
-output "postgres_secret_arn" {
-  description = "ARN of the AWS Secrets Manager secret containing database credentials"
-  value       = module.postgres.secret_arn
-  sensitive   = true
-}
-
-output "traefik_public_hostname" {
-  description = "External hostname of the Traefik LoadBalancer"
-  value       = module.traefik.load_balancer_hostname
-}
-
-output "application_url" {
-  description = "Full URL to access the application"
-  value       = module.traefik.load_balancer_hostname != null ? "http://${module.traefik.load_balancer_hostname}" : "pending - LB hostname not yet available, re-run terraform apply"
 }
 
 output "cluster_endpoint" {
@@ -52,3 +31,7 @@ output "cluster_name" {
   value = module.kubernetes.cluster_name
 }
 
+output "kubeconfig_command" {
+  description = "Command to configure kubectl for this cluster"
+  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.kubernetes.cluster_name}"
+}

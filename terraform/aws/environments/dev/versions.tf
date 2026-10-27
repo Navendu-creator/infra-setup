@@ -1,5 +1,6 @@
 terraform {
-  required_version = ">= 1.5.0"
+  # >= 1.10 for S3 native state locking (use_lockfile in backend.tf)
+  required_version = ">= 1.10.0"
 
   required_providers {
     aws = {
@@ -23,13 +24,4 @@ terraform {
       version = "~> 3.5"
     }
   }
-
-  # CHANGE THIS: Configure your S3 backend for state storage
-  # backend "s3" {
-  #   bucket         = "aws-k8s-platform-tfstate-686458136675"
-  #   key            = "aws/dev/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   encrypt        = true
-  #   dynamodb_table = "terraform-locks"
-  # }
 }
