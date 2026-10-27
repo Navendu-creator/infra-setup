@@ -19,8 +19,8 @@ node_disk_size     = 30
 # Who gets kubectl admin on the cluster. List both your own IAM user and the
 # IAM user whose keys are in GitHub secrets, otherwise each apply locks the other out.
 cluster_admin_arns = [
-  # "arn:aws:iam::<ACCOUNT_ID>:user/<your-user>",
-  # "arn:aws:iam::<ACCOUNT_ID>:user/<github-actions-user>",
+  "arn:aws:iam::731372490312:user/Navendu",
+  # "arn:aws:iam::731372490312:user/<github-actions-user>", # add if CI uses a different IAM user
 ]
 
 # Project
