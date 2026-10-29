@@ -11,7 +11,7 @@ vpc_cidr = "10.0.0.0/16"
 # Kubernetes - CHANGE THESE to match your naming convention
 cluster_name       = "dev-cluster"
 kubernetes_version = "1.34"
-node_instance_type = "m7i-flex.xlarge" # 4 vCPU / 16 GiB; Wazuh runs one indexer per node
+node_instance_type = "m7i-flex.large" # 2 vCPU / 8 GiB, the largest AWS Free plan type; Wazuh is sized for 3 of these
 node_capacity_type = "ON_DEMAND"
 node_count         = 3
 node_disk_size     = 30
