@@ -83,6 +83,18 @@ variable "enable_ebs_csi_driver" {
   default     = false
 }
 
+variable "enable_network_policy" {
+  description = "Manage the VPC CNI as an add-on with network policy enforcement on"
+  type        = bool
+  default     = false
+}
+
+variable "enable_lb_controller_iam" {
+  description = "Create the AWS Load Balancer Controller's IAM role and Pod Identity association (needs enable_ebs_csi_driver for the Pod Identity agent)"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Common tags applied to all resources"
   type        = map(string)

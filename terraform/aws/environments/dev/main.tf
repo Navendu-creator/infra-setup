@@ -43,7 +43,9 @@ module "kubernetes" {
   cluster_log_types  = []
   cluster_admin_arns = var.cluster_admin_arns
 
-  enable_ebs_csi_driver = true
+  enable_ebs_csi_driver    = true
+  enable_network_policy    = true
+  enable_lb_controller_iam = true
 
   tags = local.common_tags
 }
