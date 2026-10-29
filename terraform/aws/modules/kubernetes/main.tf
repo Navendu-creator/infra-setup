@@ -240,5 +240,74 @@ resource "aws_eks_addon" "ebs_csi" {
   tags = var.tags
 }
 
+# VPC CNI as a managed add-on, so its config is in code. Network policy
+# enforcement is off in the default install; without it NetworkPolicies are
+# silently ignored.
+resource "aws_eks_addon" "vpc_cni" {
+  count        = var.enable_network_policy ? 1 : 0
+  cluster_name = aws_eks_cluster.this.name
+  addon_name   = "vpc-cni"
+
+  # Take over the self-managed aws-node DaemonSet EKS installed at creation.
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  configuration_values = jsonencode({
+    enableNetworkPolicy = "true"
+  })
+
+  # The add-on only reports ACTIVE once aws-node pods are running on nodes.
+  depends_on = [aws_eks_node_group.this]
+
+  tags = var.tags
+}
+
+# AWS Load Balancer Controller: IAM only. The controller itself is a Helm
+# chart deployed by Argo CD, with service account kube-system/aws-load-balancer-controller.
+resource "aws_iam_policy" "lb_controller" {
+  count       = var.enable_lb_controller_iam ? 1 : 0
+  name        = "${var.cluster_name}-lb-controller"
+  description = "AWS Load Balancer Controller for ${var.cluster_name}"
+  # Upstream docs/install/iam_policy.json; refresh it when bumping the controller's major/minor version.
+  policy = file("${path.module}/lb-controller-iam-policy.json")
+
+  tags = var.tags
+}
+
+resource "aws_iam_role" "lb_controller" {
+  count = var.enable_lb_controller_iam ? 1 : 0
+  name  = "${var.cluster_name}-lb-controller-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "pods.eks.amazonaws.com" }
+      Action    = ["sts:AssumeRole", "sts:TagSession"]
+    }]
+  })
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "lb_controller" {
+  count      = var.enable_lb_controller_iam ? 1 : 0
+  role       = aws_iam_role.lb_controller[0].name
+  policy_arn = aws_iam_policy.lb_controller[0].arn
+}
+
+resource "aws_eks_pod_identity_association" "lb_controller" {
+  count           = var.enable_lb_controller_iam ? 1 : 0
+  cluster_name    = aws_eks_cluster.this.name
+  namespace       = "kube-system"
+  service_account = "aws-load-balancer-controller"
+  role_arn        = aws_iam_role.lb_controller[0].arn
+
+  # The Pod Identity agent hands out the credentials.
+  depends_on = [aws_eks_addon.pod_identity_agent]
+
+  tags = var.tags
+}
+
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
