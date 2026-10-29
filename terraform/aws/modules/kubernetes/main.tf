@@ -107,10 +107,12 @@ resource "aws_eks_cluster" "this" {
 
 # EKS Node Group
 resource "aws_eks_node_group" "this" {
-  cluster_name    = aws_eks_cluster.this.name
-  node_group_name = "${var.cluster_name}-node-group"
-  node_role_arn   = aws_iam_role.node.arn
-  subnet_ids      = var.node_subnet_ids != null ? var.node_subnet_ids : var.private_subnet_ids
+  cluster_name = aws_eks_cluster.this.name
+  # Prefix, not a fixed name, so a replacement (e.g. new instance type) can be
+  # created before the old group is deleted.
+  node_group_name_prefix = "${var.cluster_name}-node-group-"
+  node_role_arn          = aws_iam_role.node.arn
+  subnet_ids             = var.node_subnet_ids != null ? var.node_subnet_ids : var.private_subnet_ids
 
   instance_types = [var.node_instance_type]
   capacity_type  = var.node_capacity_type
@@ -120,6 +122,12 @@ resource "aws_eks_node_group" "this" {
     desired_size = var.node_count
     min_size     = var.node_count
     max_size     = var.node_count
+  }
+
+  # Keep the old nodes running until the new ones are up. The account's vCPU
+  # quota must cover both groups during a replacement.
+  lifecycle {
+    create_before_destroy = true
   }
 
   depends_on = [
