@@ -11,8 +11,8 @@ vpc_cidr = "10.0.0.0/16"
 # Kubernetes - CHANGE THESE to match your naming convention
 cluster_name       = "dev-cluster"
 kubernetes_version = "1.34"
-node_instance_type = "t3.large"
-node_capacity_type = "SPOT"
+node_instance_type = "m7i-flex.large"
+node_capacity_type = "ON_DEMAND"
 node_count         = 2
 node_disk_size     = 30
 
